@@ -310,9 +310,10 @@ void DlgAddWatchEntry::accept()
   {
     QString errorMsg =
         tr("The address you entered is invalid, make sure it is an "
-           "hexadecimal number between 0x80000000 and 0x817FFFFF");
+           "hexadecimal number between 0x%08X and 0x%08X").arg(Common::g_mem1_start, Common::g_mem1_end - 1);
     if (DolphinComm::DolphinAccessor::isMEM2Present())
-      errorMsg.append(tr(" or between 0x90000000 and 0x93FFFFFF"));
+      errorMsg.append(
+          tr(" or between 0x%08X and 0x%08X").arg(Common::g_mem2_start, Common::g_mem2_end - 1));
 
     QMessageBox* errorBox = new QMessageBox(QMessageBox::Critical, tr("Invalid address"), errorMsg,
                                             QMessageBox::Ok, this);

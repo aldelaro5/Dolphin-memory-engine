@@ -89,6 +89,18 @@ void MemViewer::updateMemoryData()
 
 void MemViewer::updateViewer()
 {
+  if (m_currentFirstAddress > Common::g_mem2_start)
+  {
+    m_memViewStart = Common::g_mem2_start;
+    m_memViewEnd = Common::g_mem2_end;
+  }
+  else
+  {
+    m_memViewStart = Common::g_mem1_start;
+    m_memViewEnd = Common::g_mem1_end;
+  }
+  
+  verticalScrollBar()->setRange(0, ((m_memViewEnd - m_memViewStart) / m_numColumns) - m_numRows);
   updateMemoryData();
   viewport()->update();
   if (!m_validMemory)
