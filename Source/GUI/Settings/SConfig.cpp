@@ -76,12 +76,12 @@ void SConfig::setViewerNbrBytesSeparator(const int viewerNbrBytesSeparator)
   m_settings->setValue("viewerSettings/nbrBytesSeparator", viewerNbrBytesSeparator);
 }
 
-void SConfig::setMEM1Size(const u32 mem1_size)
+void SConfig::setMEM1Size(const u32 g_mem1_size_real)
 {
-  m_settings->setValue("memorySettings/MEM1Size", mem1_size);
+  m_settings->setValue("memorySettings/MEM1Size", g_mem1_size_real);
 }
 
-void SConfig::setMEM2Size(const u32 mem2_size)
+void SConfig::setMEM2Size(const u32 g_mem2_size_real)
 {
-  m_settings->setValue("memorySettings/MEM2Size", mem2_size);
+  m_settings->setValue("memorySettings/MEM2Size", g_mem2_size_real);
 }

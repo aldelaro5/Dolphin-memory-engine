@@ -115,7 +115,7 @@ MemWatchTreeNode* CheatEngineParser::parseCheatEntries(MemWatchTreeNode* node,
 void CheatEngineParser::parseCheatEntry(MemWatchTreeNode* node, const bool useDolphinPointer)
 {
   std::string label = "No label";
-  u32 consoleAddress = Common::MEM1_START;
+  u32 consoleAddress = Common::g_mem1_start;
   Common::MemType type = Common::MemType::type_byte;
   Common::MemBase base = Common::MemBase::base_decimal;
   bool isUnsigned = true;
@@ -205,7 +205,7 @@ void CheatEngineParser::parseCheatEntry(MemWatchTreeNode* node, const bool useDo
           else
           {
             consoleAddressCandidate -= m_tableStartAddress;
-            consoleAddressCandidate += Common::MEM1_START;
+            consoleAddressCandidate += Common::g_mem1_start;
             if (DolphinComm::DolphinAccessor::isValidConsoleAddress(consoleAddressCandidate))
               consoleAddress = consoleAddressCandidate;
             else
@@ -233,7 +233,7 @@ void CheatEngineParser::parseCheatEntry(MemWatchTreeNode* node, const bool useDo
               }
               else
               {
-                consoleAddressCandidate += Common::MEM1_START;
+                consoleAddressCandidate += Common::g_mem1_start;
                 if (DolphinComm::DolphinAccessor::isValidConsoleAddress(consoleAddressCandidate))
                   consoleAddress = consoleAddressCandidate;
                 else

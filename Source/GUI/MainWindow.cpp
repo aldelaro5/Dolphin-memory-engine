@@ -146,7 +146,7 @@ void MainWindow::makeLayouts()
 
 void MainWindow::makeMemViewer()
 {
-  m_viewer = new MemViewerWidget(nullptr, Common::MEM1_START);
+  m_viewer = new MemViewerWidget(nullptr, Common::g_mem1_start);
   connect(m_viewer, &MemViewerWidget::mustUnhook, this, &MainWindow::onUnhook);
   connect(m_viewer, &MemViewerWidget::addWatchRequested, m_watcher, &MemWatchWidget::addWatchEntry);
   connect(m_watcher, &MemWatchWidget::goToAddressInViewer, this,

@@ -24,8 +24,8 @@ public:
   void setFreezeTimerMs(const int freezeTimerMs);
   void setScannerUpdateTimerMs(const int scannerUpdateTimerMs);
   void setViewerUpdateTimerMs(const int viewerUpdateTimerMs);
-  void setMEM1Size(const u32 mem1_size);
-  void setMEM2Size(const u32 mem2_size);
+  void setMEM1Size(const u32 g_mem1_size_real);
+  void setMEM2Size(const u32 g_mem2_size_real);
 
   void setViewerNbrBytesSeparator(const int viewerNbrBytesSeparator);
 

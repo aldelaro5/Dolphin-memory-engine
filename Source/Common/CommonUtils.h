@@ -39,6 +39,19 @@ inline u64 bSwap64(u64 data)
 }
 #endif
 
+constexpr u32 NextPowerOf2(u32 value)
+{
+  --value;
+  value |= value >> 1;
+  value |= value >> 2;
+  value |= value >> 4;
+  value |= value >> 8;
+  value |= value >> 16;
+  ++value;
+
+  return value;
+};
+
 inline u32 dolphinAddrToOffset(u32 addr)
 {
   return addr &= 0x7FFFFFFF;

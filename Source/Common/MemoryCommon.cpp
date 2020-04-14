@@ -8,9 +8,29 @@
 
 #include "../Common/CommonTypes.h"
 #include "../Common/CommonUtils.h"
+#include "../GUI/Settings/SConfig.h"
 
 namespace Common
 {
+u32 g_mem1_size_real = 0x01800000;
+u32 g_mem2_size_real = 0x04000000;
+u32 g_mem1_size = 0x02000000;
+u32 g_mem2_size = 0x04000000;
+u32 g_mem1_end = 0x81800000;
+u32 g_mem2_end = 0x94000000;
+const u32 g_mem1_start = 0x80000000;
+const u32 g_mem2_start = 0x90000000;
+
+void UpdateMemoryValues()
+{
+  g_mem1_size_real = SConfig::getInstance().getMEM1Size();
+  g_mem2_size_real = SConfig::getInstance().getMEM2Size();
+  g_mem1_size = NextPowerOf2(g_mem1_size_real);
+  g_mem2_size = NextPowerOf2(g_mem2_size_real);
+  g_mem1_end = g_mem1_start + g_mem1_size_real;
+  g_mem2_end = g_mem2_start + g_mem2_size_real;
+}
+
 size_t getSizeForType(const MemType type, const size_t length)
 {
   switch (type)

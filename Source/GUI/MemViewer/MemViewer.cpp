@@ -53,8 +53,8 @@ void MemViewer::initialise()
   m_updatedRawMemoryData = new char[m_numCells];
   m_lastRawMemoryData = new char[m_numCells];
   m_memoryMsElapsedLastChange = new int[m_numCells];
-  m_memViewStart = Common::MEM1_START;
-  m_memViewEnd = Common::MEM1_END;
+  m_memViewStart = Common::g_mem1_start;
+  m_memViewEnd = Common::g_mem1_end;
   m_currentFirstAddress = m_memViewStart;
 
   std::fill(m_memoryMsElapsedLastChange, m_memoryMsElapsedLastChange + m_numCells, 0);
@@ -105,9 +105,9 @@ void MemViewer::jumpToAddress(const u32 address)
   if (DolphinComm::DolphinAccessor::isValidConsoleAddress(address))
   {
     m_currentFirstAddress = address;
-    if (address < Common::MEM1_END && m_memViewStart != Common::MEM1_START)
+    if (address < Common::g_mem1_end && m_memViewStart != Common::g_mem1_start)
       changeMemoryRegion(false);
-    else if (address >= Common::MEM2_START && m_memViewStart != Common::MEM2_START)
+    else if (address >= Common::g_mem2_start && m_memViewStart != Common::g_mem2_start)
       changeMemoryRegion(true);
 
     if (m_currentFirstAddress > m_memViewEnd - m_numCells)
@@ -127,8 +127,8 @@ void MemViewer::jumpToAddress(const u32 address)
 
 void MemViewer::changeMemoryRegion(const bool isMEM2)
 {
-  m_memViewStart = isMEM2 ? Common::MEM2_START : Common::MEM1_START;
-  m_memViewEnd = isMEM2 ? Common::MEM2_END : Common::MEM1_END;
+  m_memViewStart = isMEM2 ? Common::g_mem2_start : Common::g_mem1_start;
+  m_memViewEnd = isMEM2 ? Common::g_mem2_end : Common::g_mem1_end;
   verticalScrollBar()->setRange(0, ((m_memViewEnd - m_memViewStart) / m_numColumns) - m_numRows);
 }
 
