@@ -74,9 +74,38 @@ DlgSettings::DlgSettings(QWidget* parent) : QDialog(parent)
     }
   });
 
+  // This is my new stuff
+
+  QGroupBox* grbMemorySizeSettings = new QGroupBox("Memory Size settings");
+
+  m_spnMEM1Size = new QSpinBox();
+  m_spnMEM1Size->setMinimum(0x01800000U);
+  m_spnMEM1Size->setMaximum(0x04000000U);
+  m_spnMEM2Size = new QSpinBox();
+  m_spnMEM2Size->setMinimum(0x04000000U);
+  m_spnMEM2Size->setMaximum(0x08000000U);
+
+  QFormLayout* memorySettingsInputLayout = new QFormLayout();
+  memorySettingsInputLayout->addRow("MEM1 Size (bytes)", m_spnMEM1Size);
+  memorySettingsInputLayout->addRow("MEM2 Size (bytes)", m_spnMEM2Size);
+  memorySettingsInputLayout->setLabelAlignment(Qt::AlignRight);
+
+  QLabel* lblMemorySettingsDescription = new QLabel(
+      "WIP");
+  lblMemorySettingsDescription->setWordWrap(true);
+
+  QVBoxLayout* memorySizeSettings = new QVBoxLayout;
+  memorySizeSettings->addWidget(lblMemorySettingsDescription);
+  memorySizeSettings->addLayout(memorySettingsInputLayout);
+
+  grbMemorySizeSettings->setLayout(memorySizeSettings);
+
+  // end my new stuff
+
   QVBoxLayout* mainLayout = new QVBoxLayout;
   mainLayout->addWidget(grbTimerSettings);
   mainLayout->addWidget(grbViewerSettings);
+  mainLayout->addWidget(grbMemorySizeSettings);
   mainLayout->addWidget(m_buttonsDlg);
   setLayout(mainLayout);
 
@@ -98,6 +127,8 @@ void DlgSettings::loadSettings()
   m_spnFreezeTimerMs->setValue(SConfig::getInstance().getFreezeTimerMs());
   m_cmbViewerBytesSeparator->setCurrentIndex(
       m_cmbViewerBytesSeparator->findData(SConfig::getInstance().getViewerNbrBytesSeparator()));
+  m_spnMEM1Size->setValue(SConfig::getInstance().getMEM1Size());
+  m_spnMEM2Size->setValue(SConfig::getInstance().getMEM2Size());
 }
 
 void DlgSettings::saveSettings() const
@@ -106,6 +137,7 @@ void DlgSettings::saveSettings() const
   SConfig::getInstance().setScannerUpdateTimerMs(m_spnScannerUpdateTimerMs->value());
   SConfig::getInstance().setViewerUpdateTimerMs(m_spnViewerUpdateTimerMs->value());
   SConfig::getInstance().setFreezeTimerMs(m_spnFreezeTimerMs->value());
-  SConfig::getInstance().setViewerNbrBytesSeparator(
-      m_cmbViewerBytesSeparator->currentData().toInt());
+  SConfig::getInstance().setViewerNbrBytesSeparator(m_cmbViewerBytesSeparator->currentData().toInt());
+  SConfig::getInstance().setMEM1Size(m_spnMEM1Size->value());
+  SConfig::getInstance().setMEM2Size(m_spnMEM1Size->value());
 }
