@@ -49,7 +49,7 @@ bool LinuxDolphinProcess::obtainEmuRAMInformations()
 
         u64 test = SecondAddress - firstAddress;
 
-        if (SecondAddress - firstAddress == 0x2000000)
+        if (SecondAddress - firstAddress == Common::g_mem1_size)
         {
           m_emuRAMAddressStart = firstAddress;
           MEM1Found = true;

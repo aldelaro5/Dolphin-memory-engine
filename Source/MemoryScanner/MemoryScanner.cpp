@@ -20,11 +20,11 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   u32 ramSize = 0;
   if (DolphinComm::DolphinAccessor::isMEM2Present())
   {
-    ramSize = Common::MEM1_SIZE + Common::MEM2_SIZE;
+    ramSize = Common::g_mem1_size_real + Common::g_mem2_size_real;
     m_scanRAMCache = new char[ramSize];
-    if (!DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(Common::MEM2_START),
-                                                   m_scanRAMCache + Common::MEM1_SIZE,
-                                                   Common::MEM2_SIZE, false))
+    if (!DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(Common::g_mem2_start),
+                                                   m_scanRAMCache + Common::g_mem1_size_real,
+                                                   Common::g_mem2_size_real, false))
     {
       delete[] m_scanRAMCache;
       m_scanRAMCache = nullptr;
@@ -33,12 +33,12 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
   }
   else
   {
-    ramSize = Common::MEM1_SIZE;
+    ramSize = Common::g_mem1_size_real;
     m_scanRAMCache = new char[ramSize];
   }
 
-  if (!DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(Common::MEM1_START),
-                                                 m_scanRAMCache, Common::MEM1_SIZE, false))
+  if (!DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(Common::g_mem1_start),
+                                                 m_scanRAMCache, Common::g_mem1_size_real, false))
   {
     delete[] m_scanRAMCache;
     m_scanRAMCache = nullptr;
@@ -152,8 +152,8 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
     if (isResult)
     {
       u32 consoleOffset = 0;
-      if (i >= Common::MEM1_SIZE)
-        consoleOffset = i + (Common::MEM2_START - Common::MEM1_END);
+      if (i >= Common::g_mem1_size_real)
+        consoleOffset = i + (Common::g_mem2_start - Common::g_mem1_end);
       else
         consoleOffset = i;
       m_resultsConsoleAddr.push_back(Common::offsetToDolphinAddr(consoleOffset));
@@ -175,11 +175,11 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   char* newerRAMCache = nullptr;
   if (DolphinComm::DolphinAccessor::isMEM2Present())
   {
-    ramSize = Common::MEM1_SIZE + Common::MEM2_SIZE;
+    ramSize = Common::g_mem1_size_real + Common::g_mem2_size_real;
     newerRAMCache = new char[ramSize];
-    if (!DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(Common::MEM2_START),
-                                                   newerRAMCache + Common::MEM1_SIZE,
-                                                   Common::MEM2_SIZE, false))
+    if (!DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(Common::g_mem2_start),
+                                                   newerRAMCache + Common::g_mem1_size_real,
+                                                   Common::g_mem2_size_real, false))
     {
       delete[] m_scanRAMCache;
       m_scanRAMCache = nullptr;
@@ -189,12 +189,12 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
   }
   else
   {
-    ramSize = Common::MEM1_SIZE;
+    ramSize = Common::g_mem1_size_real;
     newerRAMCache = new char[ramSize];
   }
 
-  if (!DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(Common::MEM1_START),
-                                                 newerRAMCache, Common::MEM1_SIZE, false))
+  if (!DolphinComm::DolphinAccessor::readFromRAM(Common::dolphinAddrToOffset(Common::g_mem1_start),
+                                                 newerRAMCache, Common::g_mem1_size_real, false))
   {
     delete[] m_scanRAMCache;
     m_scanRAMCache = nullptr;
@@ -255,8 +255,8 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
     for (u32 i = 0; i < (ramSize - m_memSize); i += increment)
     {
       u32 consoleOffset = 0;
-      if (i >= Common::MEM1_SIZE)
-        consoleOffset = i + (Common::MEM2_START - Common::MEM1_END);
+      if (i >= Common::g_mem1_size_real)
+        consoleOffset = i + (Common::g_mem2_start - Common::g_mem1_end);
       else
         consoleOffset = i;
       if (isHitNextScan(filter, memoryToCompare1, memoryToCompare2, noOffset, newerRAMCache,
@@ -271,8 +271,8 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
     for (auto i : m_resultsConsoleAddr)
     {
       u32 ramIndex = 0;
-      if (Common::dolphinAddrToOffset(i) >= Common::MEM1_SIZE)
-        ramIndex = Common::dolphinAddrToOffset(i) - (Common::MEM2_START - Common::MEM1_END);
+      if (Common::dolphinAddrToOffset(i) >= Common::g_mem1_size_real)
+        ramIndex = Common::dolphinAddrToOffset(i) - (Common::g_mem2_start - Common::g_mem1_end);
       else
         ramIndex = Common::dolphinAddrToOffset(i);
       if (isHitNextScan(filter, memoryToCompare1, memoryToCompare2, noOffset, newerRAMCache,
@@ -455,8 +455,8 @@ std::string MemScanner::getFormattedScannedValueAt(const int index) const
 {
   u32 offset = Common::dolphinAddrToOffset(m_resultsConsoleAddr.at(index));
   u32 ramIndex = 0;
-  if (offset >= Common::MEM1_SIZE)
-    ramIndex = offset - (Common::MEM2_START - Common::MEM1_END);
+  if (offset >= Common::g_mem1_size_real)
+    ramIndex = offset - (Common::g_mem2_start - Common::g_mem1_end);
   else
     ramIndex = offset;
   return Common::formatMemoryToString(&m_scanRAMCache[ramIndex], m_memType, m_memSize, m_memBase,
@@ -474,8 +474,8 @@ std::string MemScanner::getFormattedCurrentValueAt(const int index) const
   {
     u32 offset = Common::dolphinAddrToOffset(m_resultsConsoleAddr.at(index));
     u32 ramIndex = 0;
-    if (offset >= Common::MEM1_SIZE)
-      ramIndex = offset - (Common::MEM2_START - Common::MEM1_END);
+    if (offset >= Common::g_mem1_size_real)
+      ramIndex = offset - (Common::g_mem2_start - Common::g_mem1_end);
     else
       ramIndex = offset;
     return DolphinComm::DolphinAccessor::getFormattedValueFromCache(ramIndex, m_memType, m_memSize,

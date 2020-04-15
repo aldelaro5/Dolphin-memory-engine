@@ -69,12 +69,12 @@ void MemViewerWidget::onJumpToAddressTextChanged()
 
 void MemViewerWidget::onGoToMEM1Start()
 {
-  m_memViewer->jumpToAddress(Common::MEM1_START);
+  m_memViewer->jumpToAddress(Common::g_mem1_start);
 }
 
 void MemViewerWidget::onGoToMEM2Start()
 {
-  m_memViewer->jumpToAddress(Common::MEM2_START);
+  m_memViewer->jumpToAddress(Common::g_mem2_start);
 }
 
 void MemViewerWidget::hookStatusChanged(bool hook)
@@ -88,8 +88,8 @@ void MemViewerWidget::hookStatusChanged(bool hook)
 void MemViewerWidget::onMEM2StatusChanged(bool enabled)
 {
   m_btnGoToMEM2Start->setEnabled(enabled);
-  if (!enabled && m_memViewer->getCurrentFirstAddress() >= Common::MEM2_START)
-    m_memViewer->jumpToAddress(Common::MEM1_START);
+  if (!enabled && m_memViewer->getCurrentFirstAddress() >= Common::g_mem2_start)
+    m_memViewer->jumpToAddress(Common::g_mem1_start);
 }
 
 void MemViewerWidget::goToAddress(u32 address)

@@ -7,13 +7,16 @@
 
 namespace Common
 {
-const u32 MEM1_SIZE = 0x1800000;
-const u32 MEM1_START = 0x80000000;
-const u32 MEM1_END = 0x81800000;
+extern u32 g_mem1_size_real;
+extern u32 g_mem2_size_real;
+extern u32 g_mem1_size;
+extern u32 g_mem2_size;
+extern u32 g_mem1_end;
+extern u32 g_mem2_end;
+extern const u32 g_mem1_start;
+extern const u32 g_mem2_start;
 
-const u32 MEM2_SIZE = 0x4000000;
-const u32 MEM2_START = 0x90000000;
-const u32 MEM2_END = 0x94000000;
+void UpdateMemoryValues();
 
 enum class MemType
 {

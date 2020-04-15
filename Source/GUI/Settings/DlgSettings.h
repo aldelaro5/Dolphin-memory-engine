@@ -22,4 +22,6 @@ private:
   QSpinBox* m_spnFreezeTimerMs;
   QComboBox* m_cmbViewerBytesSeparator;
   QDialogButtonBox* m_buttonsDlg;
+  QSpinBox* m_spnMEM1Size;
+  QSpinBox* m_spnMEM2Size;
 };

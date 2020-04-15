@@ -2,6 +2,7 @@
 
 #include "WindowsDolphinProcess.h"
 #include "../../Common/CommonUtils.h"
+#include "../../Common/MemoryCommon.h"
 
 #include <Psapi.h>
 #include <string>
@@ -76,7 +77,7 @@ bool WindowsDolphinProcess::obtainEmuRAMInformations()
       continue;
     }
 
-    if (info.RegionSize == 0x2000000 && info.Type == MEM_MAPPED)
+    if (info.RegionSize == Common::g_mem1_size && info.Type == MEM_MAPPED)
     {
       // Here, it's likely the right page, but it can happen that multiple pages with these criteria
       // exists and have nothing to do with the emulated memory. Only the right page has valid
