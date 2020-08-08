@@ -5,9 +5,13 @@ if(WIN32)
     set(DolphinProcessSrc DolphinProcess/Windows/WindowsDolphinProcess.cpp)
 endif(WIN32)
 
-if(UNIX)
+if(UNIX AND NOT APPLE)
    set(DolphinProcessSrc DolphinProcess/Linux/LinuxDolphinProcess.cpp)
-endif(UNIX)
+endif(UNIX AND NOT APPLE)
+
+if(APPLE)
+   set(DolphinProcessSrc DolphinProcess/Mac/MacDolphinProcess.cpp)
+endif(APPLE)
 
 set(SRCS ${DolphinProcessSrc}
          DolphinProcess/DolphinAccessor.cpp  
@@ -32,7 +36,7 @@ set(SRCS ${DolphinProcessSrc}
          GUI/MainWindow.cpp
          main.cpp)
 
-set(CMAKE_INCLUE_CURRENT_DIR ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)

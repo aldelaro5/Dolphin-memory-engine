@@ -14,3 +14,4 @@ Source/*.VC.opendb
 Source/*.VC.db
 Source/.vs/
 Source/.vscode/
+.DS_Store
