@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(Dolphin-memory-engine)
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 if(WIN32)
     set(DolphinProcessSrc DolphinProcess/Windows/WindowsDolphinProcess.cpp)
 endif(WIN32)
