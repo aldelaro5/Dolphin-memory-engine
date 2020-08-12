@@ -135,7 +135,6 @@ public:
   size_t getLength() const;
   bool getIsUnsigned() const;
   std::string getFormattedScannedValueAt(const int index) const;
-  Common::MemOperationReturnCode updateCurrentRAMCache();
   std::string getFormattedCurrentValueAt(int index) const;
   void removeResultAt(int index);
   bool typeSupportsAdditionalOptions(const Common::MemType type) const;

@@ -87,17 +87,13 @@ bool MacDolphinProcess::obtainEmuRAMInformations()
 
 bool MacDolphinProcess::readFromRAM(const u32 offset, char* buffer, size_t size, const bool withBSwap)
 {
-  natural_t nread;
+  vm_size_t nread;
   u64 RAMAddress = m_emuRAMAddressStart + offset;
 
-  pointer_t tmpBuf;
-  if(vm_read(m_task, RAMAddress, size, &tmpBuf, &nread) != KERN_SUCCESS)
+  if(vm_read_overwrite(m_task, RAMAddress, size, reinterpret_cast<vm_address_t>(buffer), &nread) != KERN_SUCCESS)
     return false;
   if (nread != size)
     return false;
-
-  std::memcpy(buffer, reinterpret_cast<const void*>(tmpBuf), nread);
-  vm_deallocate(m_currentTask, tmpBuf, nread);
 
   if (withBSwap)
   {

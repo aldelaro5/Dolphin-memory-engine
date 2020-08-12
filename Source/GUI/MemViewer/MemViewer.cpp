@@ -78,13 +78,9 @@ void MemViewer::memoryValidityChanged(const bool valid)
 void MemViewer::updateMemoryData()
 {
   std::swap(m_updatedRawMemoryData, m_lastRawMemoryData);
-  m_validMemory =
-      (DolphinComm::DolphinAccessor::updateRAMCache() == Common::MemOperationReturnCode::OK);
   if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress))
-    DolphinComm::DolphinAccessor::copyRawMemoryFromCache(m_updatedRawMemoryData,
-                                                         m_currentFirstAddress, m_numCells);
-  if (!m_validMemory)
-    emit memErrorOccured();
+    DolphinComm::DolphinAccessor::copyRawMemory(m_updatedRawMemoryData,
+                                                m_currentFirstAddress, m_numCells);
 }
 
 void MemViewer::updateViewer()
@@ -375,7 +371,7 @@ void MemViewer::copySelection(Common::MemType type)
   char* selectedMem = new char[selectionLength];
   if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress))
   {
-    DolphinComm::DolphinAccessor::copyRawMemoryFromCache(
+    DolphinComm::DolphinAccessor::copyRawMemory(
         selectedMem, m_currentFirstAddress + indexStart, selectionLength);
     std::string bytes = Common::formatMemoryToString(selectedMem, type, selectionLength,
                                                      Common::MemBase::base_none, true);
