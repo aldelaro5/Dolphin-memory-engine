@@ -463,11 +463,6 @@ std::string MemScanner::getFormattedScannedValueAt(const int index) const
                                       !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
 }
 
-Common::MemOperationReturnCode MemScanner::updateCurrentRAMCache()
-{
-  return DolphinComm::DolphinAccessor::updateRAMCache();
-}
-
 std::string MemScanner::getFormattedCurrentValueAt(const int index) const
 {
   if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_resultsConsoleAddr.at(index)))
@@ -478,8 +473,8 @@ std::string MemScanner::getFormattedCurrentValueAt(const int index) const
       ramIndex = offset - (Common::MEM2_START - Common::MEM1_END);
     else
       ramIndex = offset;
-    return DolphinComm::DolphinAccessor::getFormattedValueFromCache(ramIndex, m_memType, m_memSize,
-                                                                    m_memBase, !m_memIsSigned);
+    return DolphinComm::DolphinAccessor::getFormattedValue(Common::dolphinAddrToOffset(m_resultsConsoleAddr.at(index)), m_memType, m_memSize,
+                                                           m_memBase, !m_memIsSigned);
   }
   return "";
 }

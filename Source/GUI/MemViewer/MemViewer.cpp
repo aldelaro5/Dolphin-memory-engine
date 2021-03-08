@@ -8,6 +8,7 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QFontDatabase>
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>
@@ -78,13 +79,12 @@ void MemViewer::memoryValidityChanged(const bool valid)
 void MemViewer::updateMemoryData()
 {
   std::swap(m_updatedRawMemoryData, m_lastRawMemoryData);
-  m_validMemory =
-      (DolphinComm::DolphinAccessor::updateRAMCache() == Common::MemOperationReturnCode::OK);
-  if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress))
-    DolphinComm::DolphinAccessor::copyRawMemoryFromCache(m_updatedRawMemoryData,
-                                                         m_currentFirstAddress, m_numCells);
-  if (!m_validMemory)
-    emit memErrorOccured();
+  if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress)) {
+    if(DolphinComm::DolphinAccessor::copyRawMemory(m_updatedRawMemoryData,
+                                                   m_currentFirstAddress, m_numCells) != Common::MemOperationReturnCode::OK) {
+      emit memErrorOccured();
+    }
+  }
 }
 
 void MemViewer::updateViewer()
@@ -331,11 +331,9 @@ void MemViewer::updateFontSize(int newSize)
 {
   m_memoryFontSize = newSize;
 
-#ifdef __linux__
-  setFont(QFont("Monospace", m_memoryFontSize));
-#elif _WIN32
-  setFont(QFont("Courier New", m_memoryFontSize));
-#endif
+  auto font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+  font.setPointSize(m_memoryFontSize);
+  setFont(font);
 
   m_charWidthEm = fontMetrics().width(QLatin1Char('M'));
   m_charHeight = fontMetrics().height();
@@ -373,10 +371,10 @@ void MemViewer::copySelection(Common::MemType type)
   size_t selectionLength = static_cast<size_t>(indexEnd - indexStart + 1);
 
   char* selectedMem = new char[selectionLength];
-  if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress))
+  if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress) &&
+      DolphinComm::DolphinAccessor::copyRawMemory(selectedMem, m_currentFirstAddress + indexStart, selectionLength)
+        == Common::MemOperationReturnCode::OK)
   {
-    DolphinComm::DolphinAccessor::copyRawMemoryFromCache(
-        selectedMem, m_currentFirstAddress + indexStart, selectionLength);
     std::string bytes = Common::formatMemoryToString(selectedMem, type, selectionLength,
                                                      Common::MemBase::base_none, true);
     QClipboard* clipboard = QGuiApplication::clipboard();
