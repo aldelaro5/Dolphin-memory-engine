@@ -33,7 +33,7 @@ The Windows SDK version 10.0.16299.0 comes with the C++ Desktop Development Work
 ### Linux and MacOS
 > _On **Linux**, CMake and Qt 5 are required. Please refer to your distribution's documentation for specific instructions on how to install them._
 
-> _On **MacOS**, Xcode, Qt, and CMake are required. These can be installed through `xcode-select --install`, `brew install qt`, and `brew install cmake` (you may need to install [brew](https://brew.sh) first). Ensure that Qt is symlinked into a place that CMake can find it or added to `$PATH`. With brew, you may need to run `export PATH="/usr/local/opt/qt/bin:$PATH"` before compiling._
+> _On **MacOS**, Xcode, Qt 5, and CMake are required. These can be installed through `xcode-select --install`, `brew install qt5`, and `brew install cmake` (you may need to install [brew](https://brew.sh) first). Ensure that Qt is symlinked into a place that CMake can find it or added to `$PATH`. With brew, you can run `export PATH="$(brew --prefix qt5):$PATH"` before compiling. **After compilation, continue to [MacOS code signing](#macos-code-signing).**_
 
 To build, simply run the following commands from the `Source` directory:
 
@@ -54,10 +54,9 @@ Due to security hardening on recent versions of MacOS, the final executable must
 
 Then, sign the executable with the following command:
 
-    codesign --entitlements entitlements.xml -s <certificate name> ./Dolphin-memory-engine
+    codesign --entitlements ../entitlements.xml -s <certificate name> ./Dolphin-memory-engine
     
-Be sure to replace `<certificate name>` with the name of the newly created certificate and be sure that `entitlements.xml`  is in the directory with the executable (use the file from the link above or the one in the `Source` directory).
-
+Be sure to replace `<certificate name>` with the name of the newly created certificate and ensure that the path to `entitlements.xml` is correct.
 
 ## General usage
 Open Dolphin and start a game, then run this program. Make sure that this program reports that the Wii-only extra memory is present for Wii games and absent for GameCube games.
@@ -80,7 +79,7 @@ On Linux, the program may require additional kernel permissions to be able to re
 
 Where `DME` is the path of the Dolphin Memory Engine executable.  This should fix the permission problem for future executions.
 
-On MacOS, the executable must be signed or else it will not be able to access Dolphin's memory. Follow the instructions above.
+On MacOS, the executable must be signed or else it will not be able to access Dolphin's memory. Follow the instructions [above](#macos-code-signing).
 
 ## License
 This program is licensed under the MIT license which grants you the permission to do  anything you wish to with the software, as long as you preserve all copyright notices. (See the file LICENSE for the legal text.)
