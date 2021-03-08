@@ -8,6 +8,7 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QFontDatabase>
 #include <QInputDialog>
 #include <QMenu>
 #include <QMessageBox>
@@ -330,11 +331,9 @@ void MemViewer::updateFontSize(int newSize)
 {
   m_memoryFontSize = newSize;
 
-#ifdef __linux__
-  setFont(QFont("Monospace", m_memoryFontSize));
-#elif _WIN32
-  setFont(QFont("Courier New", m_memoryFontSize));
-#endif
+  auto font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+  font.setPointSize(m_memoryFontSize);
+  setFont(font);
 
   m_charWidthEm = fontMetrics().width(QLatin1Char('M'));
   m_charHeight = fontMetrics().height();
