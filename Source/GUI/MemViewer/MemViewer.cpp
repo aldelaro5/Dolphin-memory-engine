@@ -78,9 +78,12 @@ void MemViewer::memoryValidityChanged(const bool valid)
 void MemViewer::updateMemoryData()
 {
   std::swap(m_updatedRawMemoryData, m_lastRawMemoryData);
-  if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress))
-    DolphinComm::DolphinAccessor::copyRawMemory(m_updatedRawMemoryData,
-                                                m_currentFirstAddress, m_numCells);
+  if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress)) {
+    if(DolphinComm::DolphinAccessor::copyRawMemory(m_updatedRawMemoryData,
+                                                   m_currentFirstAddress, m_numCells) != Common::MemOperationReturnCode::OK) {
+      emit memErrorOccured();
+    }
+  }
 }
 
 void MemViewer::updateViewer()
@@ -369,10 +372,10 @@ void MemViewer::copySelection(Common::MemType type)
   size_t selectionLength = static_cast<size_t>(indexEnd - indexStart + 1);
 
   char* selectedMem = new char[selectionLength];
-  if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress))
+  if (DolphinComm::DolphinAccessor::isValidConsoleAddress(m_currentFirstAddress) &&
+      DolphinComm::DolphinAccessor::copyRawMemory(selectedMem, m_currentFirstAddress + indexStart, selectionLength)
+        == Common::MemOperationReturnCode::OK)
   {
-    DolphinComm::DolphinAccessor::copyRawMemory(
-        selectedMem, m_currentFirstAddress + indexStart, selectionLength);
     std::string bytes = Common::formatMemoryToString(selectedMem, type, selectionLength,
                                                      Common::MemBase::base_none, true);
     QClipboard* clipboard = QGuiApplication::clipboard();

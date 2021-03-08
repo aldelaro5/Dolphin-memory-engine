@@ -114,13 +114,16 @@ std::string DolphinAccessor::getFormattedValue(const u32 ramIndex, Common::MemTy
                                       memIsUnsigned, Common::shouldBeBSwappedForType(memType));
 }
 
-void DolphinAccessor::copyRawMemory(char* dest, const u32 consoleAddress,
+Common::MemOperationReturnCode DolphinAccessor::copyRawMemory(char* dest, const u32 consoleAddress,
                                     const size_t byteCount)
 {
   if (isValidConsoleAddress(consoleAddress) &&
       isValidConsoleAddress((consoleAddress + static_cast<u32>(byteCount)) - 1))
   {
-    readFromRAM(Common::dolphinAddrToOffset(consoleAddress), dest, byteCount, false);
+    if(readFromRAM(Common::dolphinAddrToOffset(consoleAddress), dest, byteCount, false))
+      return Common::MemOperationReturnCode::OK;
   }
+
+  return Common::MemOperationReturnCode::operationFailed;
 }
 } // namespace DolphinComm

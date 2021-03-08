@@ -32,7 +32,7 @@ public:
   static std::string getFormattedValue(const u32 ramIndex, Common::MemType memType,
                                        size_t memSize, Common::MemBase memBase,
                                        bool memIsUnsigned);
-  static void copyRawMemory(char* dest, const u32 consoleAddress, const size_t byteCount);
+  static Common::MemOperationReturnCode copyRawMemory(char* dest, const u32 consoleAddress, const size_t byteCount);
   static bool isValidConsoleAddress(const u32 address);
 
 private:
