@@ -106,6 +106,18 @@ void MemScanWidget::initialiseWidgets()
 
   m_groupScanBase = new QGroupBox(tr("Base to use"));
 
+  m_rdbUTF8 = new QRadioButton(tr("UTF-8"));
+  m_rdbUTF16 = new QRadioButton(tr("UTF-16"));
+  m_rdbUTF32 = new QRadioButton(tr("UTF-32"));
+
+  m_btnGroupStringWidth = new QButtonGroup(this);
+  m_btnGroupStringWidth->addButton(m_rdbUTF8, 0);
+  m_btnGroupStringWidth->addButton(m_rdbUTF16, 1);
+  m_btnGroupStringWidth->addButton(m_rdbUTF32, 2);
+  m_rdbUTF8->setChecked(true);
+
+  m_stringWidth = new QGroupBox(tr("String width"));
+
   m_chkSignedScan = new QCheckBox(tr("Signed value scan"));
   m_chkSignedScan->setChecked(false);
 
@@ -154,6 +166,13 @@ void MemScanWidget::makeLayouts()
   layout_buttonsBase->addWidget(m_rdbBaseBinary);
   m_groupScanBase->setLayout(layout_buttonsBase);
 
+  m_stringWidth->hide();
+  QHBoxLayout* layout_buttonsStringWidth = new QHBoxLayout();
+  layout_buttonsStringWidth->addWidget(m_rdbUTF8);
+  layout_buttonsStringWidth->addWidget(m_rdbUTF16);
+  layout_buttonsStringWidth->addWidget(m_rdbUTF32);
+  m_stringWidth->setLayout(layout_buttonsStringWidth);
+
   QHBoxLayout* layout_extraParams = new QHBoxLayout();
   layout_extraParams->addWidget(m_chkEnforceMemAlignement);
   layout_extraParams->addWidget(m_chkSignedScan);
@@ -164,6 +183,7 @@ void MemScanWidget::makeLayouts()
   scannerParams_layout->addWidget(m_cmbScanFilter);
   scannerParams_layout->addLayout(searchTerms_layout);
   scannerParams_layout->addWidget(m_groupScanBase);
+  scannerParams_layout->addWidget(m_stringWidth);
   scannerParams_layout->addLayout(layout_extraParams);
   scannerParams_layout->addStretch();
   scannerParams_layout->setContentsMargins(0, 0, 0, 0);
@@ -245,6 +265,17 @@ void MemScanWidget::updateTypeAdditionalOptions()
     m_chkSignedScan->hide();
     m_groupScanBase->hide();
   }
+
+  if(m_memScanner->typeSupportsAdditionalWidths(
+          static_cast<Common::MemType>(m_cmbScanType->currentIndex())))
+  {
+    m_stringWidth->show();
+  }
+  else
+  {
+    m_stringWidth->hide();
+  }
+  
 }
 
 void MemScanWidget::onScanFilterChanged()
@@ -258,6 +289,7 @@ void MemScanWidget::onScanFilterChanged()
     m_searchTerm2Widget->hide();
     m_chkSignedScan->hide();
     m_groupScanBase->hide();
+    m_stringWidth->hide();
     break;
   case 1:
     m_txbSearchTerm1->show();
@@ -297,9 +329,11 @@ void MemScanWidget::onFirstScan()
   m_memScanner->setIsSigned(m_chkSignedScan->isChecked());
   m_memScanner->setEnforceMemAlignement(m_chkEnforceMemAlignement->isChecked());
   m_memScanner->setBase(static_cast<Common::MemBase>(m_btnGroupScanBase->checkedId()));
+  m_memScanner->setStrWidth(static_cast<Common::StrWidth>(m_btnGroupStringWidth->checkedId()));
+
   Common::MemOperationReturnCode scannerReturn =
       m_memScanner->firstScan(getSelectedFilter(), m_txbSearchTerm1->text().toStdString(),
-                              m_txbSearchTerm2->text().toStdString());
+                              m_txbSearchTerm2->text().toStdString(), m_memScanner->getStrWidth());
   if (scannerReturn != Common::MemOperationReturnCode::OK)
   {
     handleScannerErrors(scannerReturn);
@@ -322,15 +356,16 @@ void MemScanWidget::onFirstScan()
     m_chkSignedScan->setDisabled(true);
     m_chkEnforceMemAlignement->setDisabled(true);
     m_groupScanBase->setDisabled(true);
+    m_stringWidth->setDisabled(true);
     updateScanFilterChoices();
   }
 }
 
 void MemScanWidget::onNextScan()
-{
+{  
   Common::MemOperationReturnCode scannerReturn =
       m_memScanner->nextScan(getSelectedFilter(), m_txbSearchTerm1->text().toStdString(),
-                             m_txbSearchTerm2->text().toStdString());
+                             m_txbSearchTerm2->text().toStdString(), m_memScanner->getStrWidth());
   if (scannerReturn != Common::MemOperationReturnCode::OK)
   {
     handleScannerErrors(scannerReturn);
@@ -363,6 +398,7 @@ void MemScanWidget::onResetScan()
   m_chkSignedScan->setEnabled(true);
   m_chkEnforceMemAlignement->setEnabled(true);
   m_groupScanBase->setEnabled(true);
+  m_stringWidth->setEnabled(true);
   m_resultsListModel->updateAfterScannerReset();
   updateScanFilterChoices();
 }
@@ -370,7 +406,7 @@ void MemScanWidget::onResetScan()
 void MemScanWidget::onAddSelection()
 {
   emit requestAddSelectedResultsToWatchList(m_memScanner->getType(), m_memScanner->getLength(),
-                                            m_memScanner->getIsUnsigned(), m_memScanner->getBase());
+                                            m_memScanner->getIsUnsigned(), m_memScanner->getBase(), m_memScanner->getStrWidth());
 }
 
 void MemScanWidget::onRemoveSelection()
@@ -390,7 +426,7 @@ void MemScanWidget::onRemoveSelection()
 void MemScanWidget::onAddAll()
 {
   emit requestAddAllResultsToWatchList(m_memScanner->getType(), m_memScanner->getLength(),
-                                       m_memScanner->getIsUnsigned(), m_memScanner->getBase());
+                                       m_memScanner->getIsUnsigned(), m_memScanner->getBase(), m_memScanner->getStrWidth());
 }
 
 void MemScanWidget::handleScannerErrors(const Common::MemOperationReturnCode errorCode)
@@ -431,6 +467,6 @@ void MemScanWidget::onResultListDoubleClicked(const QModelIndex& index)
   {
     emit requestAddWatchEntry(m_resultsListModel->getResultAddress(index.row()),
                               m_memScanner->getType(), m_memScanner->getLength(),
-                              m_memScanner->getIsUnsigned(), m_memScanner->getBase());
+                              m_memScanner->getIsUnsigned(), m_memScanner->getBase(), m_memScanner->getStrWidth());
   }
 }

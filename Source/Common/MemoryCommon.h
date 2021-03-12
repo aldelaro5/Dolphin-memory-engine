@@ -36,6 +36,13 @@ enum class MemBase
   base_none // Placeholder when the base doesn't matter (ie. string)
 };
 
+enum class StrWidth
+{
+  utf_8 = 0,
+  utf_16,
+  utf_32
+};
+
 enum class MemOperationReturnCode
 {
   invalidInput,
@@ -50,8 +57,25 @@ bool shouldBeBSwappedForType(const MemType type);
 int getNbrBytesAlignementForType(const MemType type);
 char* formatStringToMemory(MemOperationReturnCode& returnCode, size_t& actualLength,
                            const std::string inputString, const MemBase base, const MemType type,
-                           const size_t length);
+                           const size_t length, const StrWidth stringWidth = StrWidth::utf_8);
 std::string formatMemoryToString(const char* memory, const MemType type, const size_t length,
                                  const MemBase base, const bool isUnsigned,
-                                 const bool withBSwap = false);
+                                 const bool withBSwap = false, const StrWidth stringWidth = StrWidth::utf_8);
+template <StrWidth Width>
+std::string toUTF8String(const char* buf, int len);
+template <>
+std::string toUTF8String<StrWidth::utf_8>(const char* buf, int len);
+template <>
+std::string toUTF8String<StrWidth::utf_16>(const char* buf, int len);
+template <>
+std::string toUTF8String<StrWidth::utf_32>(const char* buf, int len);
+
+template <StrWidth Width>
+std::string convertFromUTF8(const char* buf, int len);
+template <>
+std::string convertFromUTF8<StrWidth::utf_8>(const char* buf, int len);
+template <>
+std::string convertFromUTF8<StrWidth::utf_16>(const char* buf, int len);
+template <>
+std::string convertFromUTF8<StrWidth::utf_32>(const char* buf, int len);
 } // namespace Common

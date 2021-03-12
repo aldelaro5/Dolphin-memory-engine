@@ -13,9 +13,9 @@
 MemWatchEntry::MemWatchEntry(const QString label, const u32 consoleAddress,
                              const Common::MemType type, const Common::MemBase base,
                              const bool isUnsigned, const size_t length,
-                             const bool isBoundToPointer)
+                             const bool isBoundToPointer, Common::StrWidth strWidth)
     : m_label(label), m_consoleAddress(consoleAddress), m_type(type), m_isUnsigned(isUnsigned),
-      m_base(base), m_boundToPointer(isBoundToPointer), m_length(length)
+      m_base(base), m_boundToPointer(isBoundToPointer), m_length(length), m_stringWidth(strWidth)
 {
   m_memory = new char[getSizeForType(m_type, m_length)];
 }
@@ -34,7 +34,7 @@ MemWatchEntry::MemWatchEntry(MemWatchEntry* entry)
     : m_label(entry->m_label), m_consoleAddress(entry->m_consoleAddress), m_type(entry->m_type),
       m_isUnsigned(entry->m_isUnsigned), m_base(entry->m_base),
       m_boundToPointer(entry->m_boundToPointer), m_pointerOffsets(entry->m_pointerOffsets),
-      m_length(entry->m_length), m_isValidPointer(entry->m_isValidPointer)
+      m_length(entry->m_length), m_isValidPointer(entry->m_isValidPointer), m_stringWidth(entry->m_stringWidth)
 {
   m_memory = new char[getSizeForType(entry->getType(), entry->getLength())];
   std::memcpy(m_memory, entry->getMemory(), getSizeForType(entry->getType(), entry->getLength()));
@@ -79,6 +79,11 @@ bool MemWatchEntry::isBoundToPointer() const
 Common::MemBase MemWatchEntry::getBase() const
 {
   return m_base;
+}
+
+Common::StrWidth MemWatchEntry::getStrWidth() const
+{
+  return m_stringWidth;
 }
 
 int MemWatchEntry::getPointerOffset(const int index) const
@@ -133,6 +138,11 @@ void MemWatchEntry::setTypeAndLength(const Common::MemType type, const size_t le
 void MemWatchEntry::setBase(const Common::MemBase base)
 {
   m_base = base;
+}
+
+void MemWatchEntry::setStrWidth(const Common::StrWidth width)
+{
+  m_stringWidth = width;
 }
 
 void MemWatchEntry::setLock(const bool doLock)
@@ -313,7 +323,7 @@ std::string MemWatchEntry::getStringFromMemory() const
 {
   if (m_boundToPointer && !m_isValidPointer)
     return "???";
-  return Common::formatMemoryToString(m_memory, m_type, m_length, m_base, m_isUnsigned);
+  return Common::formatMemoryToString(m_memory, m_type, m_length, m_base, m_isUnsigned, false, m_stringWidth);
 }
 
 Common::MemOperationReturnCode MemWatchEntry::writeMemoryFromString(const std::string& inputString)
@@ -321,7 +331,7 @@ Common::MemOperationReturnCode MemWatchEntry::writeMemoryFromString(const std::s
   Common::MemOperationReturnCode writeReturn = Common::MemOperationReturnCode::OK;
   size_t sizeToWrite = 0;
   char* buffer =
-      Common::formatStringToMemory(writeReturn, sizeToWrite, inputString, m_base, m_type, m_length);
+      Common::formatStringToMemory(writeReturn, sizeToWrite, inputString, m_base, m_type, m_length, m_stringWidth);
   if (writeReturn != Common::MemOperationReturnCode::OK)
     return writeReturn;
 

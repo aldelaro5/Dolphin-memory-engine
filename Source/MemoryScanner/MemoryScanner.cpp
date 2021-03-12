@@ -2,7 +2,6 @@
 
 #include "../Common/CommonUtils.h"
 #include "../DolphinProcess/DolphinAccessor.h"
-
 MemScanner::MemScanner() : m_resultsConsoleAddr(std::vector<u32>())
 {
 }
@@ -14,7 +13,8 @@ MemScanner::~MemScanner()
 
 Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter filter,
                                                      const std::string& searchTerm1,
-                                                     const std::string& searchTerm2)
+                                                     const std::string& searchTerm2,
+                                                     Common::StrWidth term1StrWidth)
 {
   m_scanRAMCache = nullptr;
   u32 ramSize = 0;
@@ -78,7 +78,7 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
     formattedSearchTerm1 = searchTerm1;
 
   char* memoryToCompare1 = Common::formatStringToMemory(
-      scanReturn, termActualLength, formattedSearchTerm1, m_memBase, m_memType, termMaxLength);
+      scanReturn, termActualLength, formattedSearchTerm1, m_memBase, m_memType, termMaxLength, term1StrWidth);
   if (scanReturn != Common::MemOperationReturnCode::OK)
   {
     delete[] memoryToCompare1;
@@ -171,7 +171,8 @@ Common::MemOperationReturnCode MemScanner::firstScan(const MemScanner::ScanFiter
 
 Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter filter,
                                                     const std::string& searchTerm1,
-                                                    const std::string& searchTerm2)
+                                                    const std::string& searchTerm2,
+                                                    Common::StrWidth term1StrWidth)
 {
   u32 ramSize = 0;
   u32 MEM2Distance = DolphinComm::DolphinAccessor::getMEM1ToMEM2Distance();
@@ -227,7 +228,7 @@ Common::MemOperationReturnCode MemScanner::nextScan(const MemScanner::ScanFiter 
       formattedSearchTerm1 = searchTerm1;
 
     memoryToCompare1 = Common::formatStringToMemory(
-        scanReturn, termActualLength, formattedSearchTerm1, m_memBase, m_memType, termMaxLength);
+        scanReturn, termActualLength, formattedSearchTerm1, m_memBase, m_memType, termMaxLength, term1StrWidth);
     if (scanReturn != Common::MemOperationReturnCode::OK)
       return scanReturn;
   }
@@ -422,6 +423,11 @@ void MemScanner::setBase(const Common::MemBase base)
   m_memBase = base;
 }
 
+void MemScanner::setStrWidth(const Common::StrWidth width)
+{
+  m_strWidth = width;
+}
+
 void MemScanner::setEnforceMemAlignement(const bool enforceAlignement)
 {
   m_enforceMemAlignement = enforceAlignement;
@@ -450,6 +456,11 @@ bool MemScanner::typeSupportsAdditionalOptions(const Common::MemType type) const
           type == Common::MemType::type_word);
 }
 
+bool MemScanner::typeSupportsAdditionalWidths(const Common::MemType type) const
+{
+  return (type == Common::MemType::type_string);
+}
+
 std::vector<u32> MemScanner::getResultsConsoleAddr() const
 {
   return m_resultsConsoleAddr;
@@ -465,7 +476,7 @@ std::string MemScanner::getFormattedScannedValueAt(const int index) const
   else
     ramIndex = offset;
   return Common::formatMemoryToString(&m_scanRAMCache[ramIndex], m_memType, m_memSize, m_memBase,
-                                      !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType));
+                                      !m_memIsSigned, Common::shouldBeBSwappedForType(m_memType), m_strWidth);
 }
 
 Common::MemOperationReturnCode MemScanner::updateCurrentRAMCache()
@@ -485,7 +496,7 @@ std::string MemScanner::getFormattedCurrentValueAt(const int index) const
     else
       ramIndex = offset;
     return DolphinComm::DolphinAccessor::getFormattedValueFromCache(ramIndex, m_memType, m_memSize,
-                                                                    m_memBase, !m_memIsSigned);
+                                                                    m_memBase, !m_memIsSigned, m_strWidth);
   }
   return "";
 }
@@ -533,6 +544,11 @@ Common::MemType MemScanner::getType() const
 Common::MemBase MemScanner::getBase() const
 {
   return m_memBase;
+}
+
+Common::StrWidth MemScanner::getStrWidth() const
+{
+  return m_strWidth;
 }
 
 size_t MemScanner::getLength() const
